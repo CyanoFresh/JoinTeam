@@ -1,7 +1,6 @@
-<?php
-if (!defined("FMJoinTeam")) die(msg("hacking_attempt",3));
+ï»¿<?php
+if (!defined("FMJoinTeam")) die("hacking attempt");
 
-//error_reporting(0);
 echo '
 <head>
     <script src="https://code.jquery.com/jquery.js"></script>
@@ -11,13 +10,11 @@ echo '
 session_start();
 require_once 'config.php';
 
-if(!isset($_SESSION['dle_user_id']) || empty($_SESSION['dle_user_id']) || $_SESSION['dle_user_id']=='') die(msg("please_login",3));
-if(!$active) die(msg("not_active",3));
-
+if(!$debug) error_reporting(0);
 
 
 #######################################
-########## Ïîäêëþ÷åíèå ê ÁÄ ###########
+########## ÐŸÐ¾Ð´ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ðº Ð‘Ð” ###########
 #######################################
 require "safemysql.class.php";
 $db = array('host' => $db_host, 'user' => $db_user, 'pass' => $db_pass,'db' => $db_name, 'charset' => $db_charset);
@@ -28,7 +25,7 @@ $db_u = new SafeMysql($db_u);
 
 
 #######################################
-########### Ñîçäàíèå òàáëèö ###########
+########### Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ñ‚Ð°Ð±Ð»Ð¸Ñ† ###########
 #######################################
 $create[] = "CREATE TABLE IF NOT EXISTS {$ankets_tbl} (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -67,7 +64,7 @@ foreach($create as $table) {
 
 
 #######################################
-############# Ïåðåìåííûå ##############
+############# ÐŸÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ðµ ##############
 #######################################
 $userinfo = $db_u->getRow("SELECT * FROM `dle_users` WHERE `user_id`=?i",$_SESSION['dle_user_id']);
 $email = $userinfo['email'];
@@ -80,13 +77,41 @@ $regdate = $userinfo['reg_date'];
 $info = $userinfo['info'];
 $fullname = $userinfo['fullname'];
 $land =  $userinfo['land'];
+
+if($check_versions){
+    $version = "1.0";
+    $v_info = file("http://raw.github.com/AlexMerser21/JoinTeam/gh-pages/version.txt");
+    $actual = trim($v_info[0]);
+    $link = trim($v_info[1]);
+    $changelog = trim($v_info[2]);
+}
+
 require_once 'lang.'.$language.'.php';
+function msg($text,$type){
+	global $lang,$login,$_POST;
+	if($type == 1) echo '<div class="alert alert-info">'.$lang[$text].'</div>';
+    elseif ($type == 2) echo '<div class="alert alert-success">'.$lang[$text].'</div>';
+    elseif ($type == 3) echo '<div class="alert alert-danger">'.$lang[$text].'</div>';
+    elseif ($type == 4) echo '<div class="alert alert-warning">'.$lang[$text].'</div>';
+    elseif ($type == 0) return $lang[$text];
+}
+if(!$active) die(msg("not_active",3));
+if(!isset($_SESSION['dle_user_id']) || empty($_SESSION['dle_user_id']) || $_SESSION['dle_user_id']=='') die(msg("please_login",3));
+
 
 
 
 #######################################
-############### Ôóíêöèè ###############
+############### Ð¤ÑƒÐ½ÐºÑ†Ð¸Ð¸ ###############
 #######################################
+
+function check_updates() {
+    global $actual,$version,$check_versions;
+    if($check_versions){
+        if($version != $actual) msg("please_update",4);
+    }
+}
+
 function is_banned() {
     global $db,$ban_tbl,$login,$if_banned;
     $get_bans = $db->getRow("SELECT * FROM ?n WHERE ?n=?s AND ?n=?i",$ban_tbl[0],$ban_tbl[1],$login,$ban_tbl[2],1);
@@ -135,46 +160,107 @@ function anket_status($login) {
 function print_form() {
 	global $db, $login, $qq_tbl;
 	$get_qq = $db->query("SELECT * FROM ?n",$qq_tbl);
-  function print_qq($name,$pre,$body,$type,$item_type,$placeholder,$required,$disabled,$other){
-    global $email,$login,$news_num,$comm_num,$dlegroup,$info,$fullname,$land,$icq,$user_ptime;
-    $name = htmlspecialchars(strip_tags($name));
-    $pre = htmlspecialchars(strip_tags(eval('return"'.addslashes($pre).'";'),'<b><a>'),ENT_QUOTES);
-    $body = htmlspecialchars(strip_tags(eval('return"'.addslashes($body).'";')));
-    $type = htmlspecialchars(strip_tags($type));
-    $item_type = htmlspecialchars(strip_tags($item_type));
-    $placeholder = htmlspecialchars(strip_tags(eval('return"'.addslashes($placeholder).'";')));
-    $other = htmlspecialchars(eval('return"'.addslashes($other).'";'),ENT_QUOTES);
-    if($required == 1) $required = "required";
-        else $required = false;
-    if($disabled == 1) $disabled = "readonly";
-        else $disabled = false;
-    echo '
-    <div class="form-group">
-        <label class="col-xs-2 control-label">'.$pre.'</label>
-        <div class="col-xs-5">';
-        if($type == "input")
-            echo '<input type="'.$item_type.'" name="'.$name.'" value="'.$body.'" class="form-control" placeholder="'.$placeholder.'" '.$other.' '.$required.' '.$disabled.'>';
-        elseif ($type == "select") {
-            echo '<select name="'.$name.'" class="form-control" '.$item_type.' '.$other.' '.$required.' '.$disabled.'>';
-            $arr = explode(", ", $body);
-            foreach($arr as $item){
-                echo '<option value="'.$item.'">'.$item.'</option>';
-            }
-            echo '</select>';
-        } elseif ($type == "textarea")
-            echo '<textarea name="'.$name.'" class="form-control" placeholder="'.$placeholder.'"  '.$other.' '.$required.' '.$disabled.'>'.$body.'</textarea>';
-    echo '</div></div>';
-  }
-  echo '
-  <form class="form-horizontal" role="form" method="POST" action="?action=sended">
-	  <div class="form-group">
-      <label class="col-xs-2 control-label">Âàø ëîãèí</label>
-      <div class="col-xs-5">
-        <input name="login" value="'.$login.'" class="form-control" readonly>
-      </div>
-    </div>';
-  while($qq = $get_qq->fetch_assoc()){
-	  echo qq($qq['name'],$qq['pre'],$qq['body'],$qq['type'],$qq['item_type'],$qq['placeholder'],$qq['required'],$qq['disabled'],$qq['other']);
+	function print_qq($name,$pre,$body,$type,$item_type,$maxlength,$placeholder,$required,$disabled,$other){
+	    global $email,$login,$news_num,$comm_num,$dlegroup,$info,$fullname,$land,$icq,$user_ptime;
+	    $name = htmlspecialchars(strip_tags($name));
+	    $pre = htmlspecialchars(strip_tags(eval('return"'.addslashes($pre).'";'),'<b><a>'),ENT_QUOTES);
+	    $body = htmlspecialchars(strip_tags(eval('return"'.addslashes($body).'";')));
+	    $type = htmlspecialchars(strip_tags($type));
+	    $item_type = htmlspecialchars(strip_tags($item_type));
+	    $placeholder = htmlspecialchars(strip_tags(eval('return"'.addslashes($placeholder).'";')));
+	    $other = htmlspecialchars(eval('return"'.addslashes($other).'";'),ENT_QUOTES);
+	    if($required == 1) $required = "required";
+	        else $required = false;
+	    if($disabled == 1) $disabled = "readonly";
+	        else $disabled = false;
+	    echo '
+	    <div class="form-group">
+	        <label class="col-xs-2 control-label">'.$pre.'</label>
+	        <div class="col-xs-5">';
+	        if($type == "input")
+	            echo '<input type="'.$item_type.'" name="'.$name.'" maxlength="'.$maxlength.'" value="'.$body.'" class="form-control" placeholder="'.$placeholder.'" '.$other.' '.$required.' '.$disabled.'>';
+	        elseif ($type == "select") {
+	            echo '<select name="'.$name.'" class="form-control" '.$item_type.' '.$other.' '.$required.' '.$disabled.'>';
+	            $arr = explode(", ", $body);
+	            foreach($arr as $item){
+	                echo '<option value="'.$item.'">'.$item.'</option>';
+	            }
+	            echo '</select>';
+	        } elseif ($type == "textarea")
+	            echo '<textarea name="'.$name.'" class="form-control" maxlength="'.$maxlength.'" placeholder="'.$placeholder.'"  '.$other.' '.$required.' '.$disabled.'>'.$body.'</textarea>';
+	    echo '</div></div>';
 	}
+  	echo '
+  	<form class="form-horizontal" role="form" method="POST">
+	  	<div class="form-group">
+	      	<label class="col-xs-2 control-label">'.msg("form_your_login",0).'</label>
+	      	<div class="col-xs-5">
+	        	<input name="login" value="'.$login.'" class="form-control" readonly>
+	      	</div>
+    	</div>';
+    while($qq = $get_qq->fetch_assoc()){
+	    echo print_qq($qq['name'],$qq['pre'],$qq['body'],$qq['type'],$qq['item_type'],$qq['maxlength'],$qq['placeholder'],$qq['required'],$qq['disabled'],$qq['other']);
+	}
+	echo '
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-info">'.msg("form_send",0).'</button>
+            </div>
+        </div>
+	</form>';
+}
+
+function print_menu() {
+	global $_GET;
+	function ankets_num() {
+		global $db,$ankets_tbl;
+		$ankets = $db->query("SELECT * FROM ?n",$ankets_tbl);
+		return $ankets->num_rows;
+	}
+	if(!isset($_GET['do']) or $_GET['do'] == "home")
+		echo '
+	    <ul class="nav nav-pills">
+         	<li class="active"><a href="?do=home">'.msg("menu_home",0).'</a></li>
+         	<li><a href="?do=vote">'.msg("menu_vote",0).'</a></li>
+         	<li class="dropdown">
+           		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              		'.msg("menu_admin",0).' <span class="caret"></span>
+           		</a>
+           		<ul class="dropdown-menu" role="menu">
+             		<li><a href="?do=ankets">'.msg("menu_admin_ankets",0).' <span class="badge">'.ankets_num().'</span></a></li>
+             		<li><a href="?do=qq">'.msg("menu_admin_qq",0).'</a></li>
+           		</ul>
+         	</li>
+       </ul>';
+	elseif($_GET['do'] == "vote")
+		echo '
+	    <ul class="nav nav-pills">
+         	<li><a href="?do=home">'.msg("menu_home",0).'</a></li>
+         	<li class="active"><a href="?do=vote">'.msg("menu_vote",0).'</a></li>
+         	<li class="dropdown">
+           		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              		'.msg("menu_admin",0).' <span class="caret"></span>
+           		</a>
+           		<ul class="dropdown-menu" role="menu">
+             		<li><a href="?do=ankets">'.msg("menu_admin_ankets",0).' <span class="badge">'.ankets_num().'</span></a></li>
+             		<li><a href="?do=qq">'.msg("menu_admin_qq",0).'</a></li>
+           		</ul>
+         	</li>
+       </ul>';
+	elseif($_GET['do'] == "qq" or $_GET['do'] == "ankets")
+		echo '
+	    <ul class="nav nav-pills">
+         	<li><a href="?do=home">'.msg("menu_home",0).'</a></li>
+         	<li><a href="?do=vote">'.msg("menu_vote",0).'</a></li>
+         	<li class="dropdown active">
+           		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              		'.msg("menu_admin",0).' <span class="caret"></span>
+           		</a>
+           		<ul class="dropdown-menu" role="menu">
+             		<li><a href="?do=ankets">'.msg("menu_admin_ankets",0).' <span class="badge">'.ankets_num().'</span></a></li>
+             		<li><a href="?do=qq">'.msg("menu_admin_qq",0).'</a></li>
+           		</ul>
+         	</li>
+       </ul>';
 }
 ?>
