@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (!defined("FMJoinTeam")) die("hacking_attempt");
 
 check_updates();

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 define("FMJoinTeam", true);
 require_once 'inc/functions.php';
 

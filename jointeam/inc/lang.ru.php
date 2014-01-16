@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $lang = array (
 	// Сообщения о ошибках
 	"hacking_attempt" => "Доступ запрещен",
