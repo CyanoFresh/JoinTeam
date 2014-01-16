@@ -8,6 +8,7 @@ echo '
     <script src="http://jointeam.freshmine.ru/includes/js/bootstrap.min.js"></script>
 </head>';
 session_start();
+header("Content-Type: text/html; charset=utf8");
 require_once 'config.php';
 
 if(!$debug) error_reporting(0);
@@ -190,7 +191,20 @@ function print_form() {
 	            echo '<textarea name="'.$name.'" class="form-control" maxlength="'.$maxlength.'" placeholder="'.$placeholder.'"  '.$other.' '.$required.' '.$disabled.'>'.$body.'</textarea>';
 	    echo '</div></div>';
 	}
-  	echo '
+
+    function print_captcha() {
+        global $recaptcha,$publickey;
+        if($recaptcha){
+            require_once('recaptchalib.php');
+            echo '
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    '.recaptcha_get_html($publickey).'
+                </div>
+            </div>';
+        }
+    }
+    echo '
   	<form class="form-horizontal" role="form" method="POST">
 	  	<div class="form-group">
 	      	<label class="col-xs-2 control-label">'.msg("form_your_login",0).'</label>
@@ -201,7 +215,7 @@ function print_form() {
     while($qq = $get_qq->fetch_assoc()){
 	    echo print_qq($qq['name'],$qq['pre'],$qq['body'],$qq['type'],$qq['item_type'],$qq['maxlength'],$qq['placeholder'],$qq['required'],$qq['disabled'],$qq['other']);
 	}
-	echo '
+	echo print_captcha().'
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <button type="submit" class="btn btn-info">'.msg("form_send",0).'</button>
