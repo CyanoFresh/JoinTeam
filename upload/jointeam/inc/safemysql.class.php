@@ -505,7 +505,7 @@ class SafeMySQL
 					$part = $this->createSET($value);
 					break;
 				case '?p':
-					$part = $value;
+					$part = mysqli_real_escape_string($value);
 					break;
 			}
 			$query .= $part;
