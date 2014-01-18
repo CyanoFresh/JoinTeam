@@ -1,0 +1,26 @@
+general:
+  debug-level: 0
+  update-check: true
+language:
+  use-github: true
+  locale: en_US
+check:
+  death-time: true
+  online-time: true
+afk:
+  enabled: true
+  interval: 60
+  timeout: 900
+  check-chat: false
+events:
+  enabled: true
+  interval: 10
+data:
+  manager: 'mysql'
+managers:
+  mysql:
+    host: localhost
+    port: '3306'
+    database: minecraft
+    username: root
+    password: password
