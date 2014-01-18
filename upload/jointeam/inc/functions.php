@@ -289,7 +289,9 @@ function print_anket($login) {
         while($ank = $anket->fetch_assoc()){
             echo '<dl class="dl-horizontal">
                     <dt>'.msg("admin_anket_login",0).'</dt><dd>'.$ank['login'].'</dd>
-                    <dt>'.msg("admin_anket_group",0).'</dt><dd>'.group($ank['login']).'</dd>';
+                    <dt>'.msg("admin_anket_group",0).'</dt><dd>'.group($ank['login']).'</dd>
+                    <dt>'.msg("admin_anket_date",0).'</dt><dd>'.$ank['date'].'</dd>
+                    <dt>'.msg("admin_anket_votes",0).'</dt><dd>'.$ank['votes'].'</dd>';
             while($qq = $get_qq->fetch_assoc()){
                 echo print_admin_qq($qq['pre'],$ank[$qq['name']]);
             }
@@ -306,8 +308,8 @@ function print_anket($login) {
     else msg("admin_anket_error",3);
 }
 
-function print_admin_qq($get_qq) {
-    global $db,$qq_tbl;
+function admin_qq($get_qq) {
+    global $db,$qq_tbl,$secret_token;
     $qq = $db->getRow("SELECT * FROM ?n WHERE `name`=?s",$qq_tbl,$get_qq);
 
     if($qq['type'] == "select") $select_s = "selected";
@@ -320,16 +322,17 @@ function print_admin_qq($get_qq) {
     if($qq['disabled'] == 1) $dis_1_s = "selected";
     elseif($qq['disabled'] == 0) $dis_0_s = "selected";
     echo '
-    <form class="form-inline" role="form" method="POST" action="?do=qq">
+    <form class="form-inline" method="POST" action="?do=qq">
       <dl class="dl-horizontal">
         <dt>'.msg("admin_add_qq_name",0).'</dt>
         <dd>
-            <input type="text" name="qq_name" value="'.$qq['name'].'" class="form-control">
-            <input type="hidden" name="qq_name2" value="'.$qq['name'].'">
+            <input type="text" name="qq_name_new" value="'.$qq['name'].'" class="form-control">
+            <input type="hidden" name="qq_name_old" value="'.$qq['name'].'">
         </dd>
         <dt>'.msg("admin_add_qq_pre",0).'</dt>
         <dd>
             <input type="text" name="qq_pre" value="'.$qq['pre'].'" class="form-control">
+            <input type=hidden name="secret_token" value="'.md5($secret_token).'" style="display: none;">
         </dd>
         <dt>'.msg("admin_add_qq_type",0).'</dt>
         <dd>
@@ -345,7 +348,7 @@ function print_admin_qq($get_qq) {
         </dd>
         <dt>'.msg("admin_add_qq_ml",0).'</dt>
         <dd>
-            <textarea name="qq_body" class="form-control">'.$qq['maxlength'].'</textarea>
+            <input type="number" min="1" name="qq_maxlength" value="'.$qq['maxlength'].'" class="form-control">
         </dd>
         <dt>'.msg("admin_add_qq_item_type",0).'</dt>
         <dd>
@@ -433,11 +436,35 @@ if(isset($_POST['add_qq']) and isset($_POST['secret_token'])) {
             $type = "VARCHAR(".$_POST['add_qq_maxlength'].")";
         elseif($_POST['add_qq_type']=="textarea") 
             $type = "TEXT(".$_POST['add_qq_maxlength'].")";
-        elseif($_POST['add_qq_type']=="select") 
+        elseif($_POST['add_qq_type']=="select") {
+            $_POST['add_qq_maxlength'] = 1;
             $type = "TEXT";
-        $db->query("INSERT INTO ?n VALUES (NULL,?s,?s,?s,?i,?s,?s,?s,?i,?i,?s)",$qq_tbl,$_POST['add_qq_name'],$_POST['add_qq_type'],$_POST['add_qq_item_type'],$_POST['add_qq_maxlength'],$_POST['add_qq_pre'],$_POST['add_qq_body'],$_POST['add_qq_placeholder'],$_POST['add_qq_required'],$_POST['add_qq_disabled'],$_POST['add_qq_other']);
+        } 
+        $db->query("INSERT INTO ?n VALUES (NULL,?s,?s,?s,?s,?s,?s,?s,?s,?s,?s)",$qq_tbl,$_POST['add_qq_name'],$_POST['add_qq_type'],$_POST['add_qq_item_type'],$_POST['add_qq_maxlength'],$_POST['add_qq_pre'],$_POST['add_qq_body'],$_POST['add_qq_placeholder'],$_POST['add_qq_required'],$_POST['add_qq_disabled'],$_POST['add_qq_other']);
         $db->query("ALTER TABLE ?n ADD ?n ?p NOT NULL",$ankets_tbl,$_POST['add_qq_name'],$type);
         $msg = msg('admin_qq_added',2);
+    } else $msg = msg("wrong_token",3);
+}
+
+if(isset($_POST['secret_token']) and isset($_POST['qq_name_new']) and isset($_POST['qq_name_old'])) {
+    if(check_token($_POST['secret_token'])) {
+        if(isset($_POST['qq_save'])) {
+            $db->query("UPDATE ?n SET `name`=?s,`type`=?s,`item_type`=?s,`maxlength`=?i,`pre`=?s,`body`=?s,`placeholder`=?s,`required`=?i,`disabled`=?i,`other`=?s 
+                WHERE `name`=?s LIMIT 1",$qq_tbl,$_POST['qq_name_new'],$_POST['qq_type'],$_POST['qq_item_type'],$_POST['qq_maxlength'],$_POST['qq_pre'],$_POST['qq_body'],$_POST['qq_placeholder'],$_POST['qq_required'],$_POST['qq_disabled'],$_POST['qq_other'],$_POST['qq_name_old']);
+            if($_POST['qq_type']=="input") 
+                $type = "VARCHAR(".$_POST['qq_maxlength'].")";
+            elseif($_POST['qq_type']=="textarea") 
+                $type = "TEXT(".$_POST['qq_maxlength'].")";
+            elseif($_POST['qq_type']=="select") 
+                $type = "TEXT";
+            $db->query("ALTER TABLE ?n CHANGE ?n ?n ?p NOT NULL",$ankets_tbl,$_POST['qq_name_old'],$_POST['qq_name_new'],$type);
+            $msg = msg("admin_qq_saved",2);
+            
+        } elseif(isset($_POST['qq_delete'])) {
+            $db->query("DELETE FROM ?n WHERE `name`=?s LIMIT 1",$qq_tbl,$_POST['qq_name_old']);
+            $db->query("ALTER TABLE ?n DROP ?n",$ankets_tbl,$_POST['qq_name_old']);
+            $msg = msg('admin_qq_deleted',2);
+        }
     } else $msg = msg("wrong_token",3);
 }
 ?>

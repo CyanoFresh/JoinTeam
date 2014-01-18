@@ -179,6 +179,6 @@ if($_GET['do'] == "ankets" and !isset($_GET['anket'])){
         </tr>';
     }
 } elseif ($_GET['do'] == "qq" and isset($_GET['qq'])) {
-    print_admin_qq($_GET['qq']);
+    admin_qq($_GET['qq']);
 }
 ?>
