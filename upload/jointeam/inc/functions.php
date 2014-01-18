@@ -5,7 +5,7 @@ echo '
 <head>
     <script src="https://code.jquery.com/jquery.js"></script>
     <link rel="stylesheet" href="https://raw.github.com/AlexMerser21/JoinTeam/gh-pages/inc/css/bootstrap.css">
-    <script src="http://jointeam.freshmine.ru/includes/js/bootstrap.min.js"></script>
+    <script src="http://alexmerser21.github.io/JoinTeam/inc/js/bootstrap.min.js"></script>
 </head>';
 session_start();
 header("Content-Type: text/html; charset=utf8");
@@ -179,7 +179,7 @@ function print_menu() {
     elseif($_GET['do'] == "vote") 
         $vote_active = 'class="active"';
 	elseif($_GET['do'] == "qq" or $_GET['do'] == "ankets") 
-        $admin_active = 'class="active"';
+        $admin_active = 'active';
     if(in_array($dlegroup,$admin_groups))
         $admin_li = '
             <li class="dropdown '.$admin_active.'">
@@ -306,6 +306,81 @@ function print_anket($login) {
     else msg("admin_anket_error",3);
 }
 
+function print_admin_qq($get_qq) {
+    global $db,$qq_tbl;
+    $qq = $db->getRow("SELECT * FROM ?n WHERE `name`=?s",$qq_tbl,$get_qq);
+
+    if($qq['type'] == "select") $select_s = "selected";
+    if($qq['type'] == "input") $input_s = "selected";
+    if($qq['type'] == "textarea") $textarea_s = "selected";
+
+    if($qq['required'] == 1) $req_1_s = "selected";
+    elseif($qq['required'] == 0) $req_0_s = "selected";
+
+    if($qq['disabled'] == 1) $dis_1_s = "selected";
+    elseif($qq['disabled'] == 0) $dis_0_s = "selected";
+    echo '
+    <form class="form-inline" role="form" method="POST" action="?do=qq">
+      <dl class="dl-horizontal">
+        <dt>'.msg("admin_add_qq_name",0).'</dt>
+        <dd>
+            <input type="text" name="qq_name" value="'.$qq['name'].'" class="form-control">
+            <input type="hidden" name="qq_name2" value="'.$qq['name'].'">
+        </dd>
+        <dt>'.msg("admin_add_qq_pre",0).'</dt>
+        <dd>
+            <input type="text" name="qq_pre" value="'.$qq['pre'].'" class="form-control">
+        </dd>
+        <dt>'.msg("admin_add_qq_type",0).'</dt>
+        <dd>
+            <select name="qq_type" class="form-control">
+                <option value="input" '.$input_s.'>'.msg("admin_add_qq_type_input",0).'</option>
+                <option value="textarea" '.$textarea_s.'>'.msg("admin_add_qq_type_ta",0).'</option>
+                <option value="select" '.$select_s.'>'.msg("admin_add_qq_type_select",0).'</option>
+            </select>
+        </dd>
+        <dt>'.msg("admin_add_qq_body",0).'</dt>
+        <dd>
+            <textarea name="qq_body" class="form-control">'.$qq['body'].'</textarea>
+        </dd>
+        <dt>'.msg("admin_add_qq_ml",0).'</dt>
+        <dd>
+            <textarea name="qq_body" class="form-control">'.$qq['maxlength'].'</textarea>
+        </dd>
+        <dt>'.msg("admin_add_qq_item_type",0).'</dt>
+        <dd>
+            <input type="text" name="qq_item_type" value="'.$qq['item_type'].'" class="form-control">
+        </dd>
+        <dt>'.msg("admin_add_qq_plch",0).'</dt>
+        <dd>
+            <input type="text" name="qq_placeholder" value="'.$qq['placeholder'].'" class="form-control">
+        </dd>
+        <dt>'.msg("admin_add_qq_required",0).'</dt>
+        <dd>
+            <select name="qq_required" class="form-control">
+                <option value="1" '.$req_1_s.'>'.msg("admin_add_qq_1",0).'</option>
+                <option value="0" '.$req_0_s.'>'.msg("admin_add_qq_0",0).'</option>
+            </select>
+        </dd>
+        <dt>'.msg("admin_add_qq_dis",0).'</dt>
+        <dd>
+            <select name="qq_disabled" class="form-control">
+                <option value="1" '.$dis_1_s.'>'.msg("admin_add_qq_1",0).'</option>
+                <option value="0" '.$dis_0_s.'>'.msg("admin_add_qq_0",0).'</option>
+            </select>
+        </dd>
+        <dt>'.msg("admin_add_qq_other",0).'</dt>
+        <dd>
+            <input type="text" name="qq_other" value="'.$qq['other'].'" class="form-control">
+        </dd>
+        <dd>
+            <input type="submit" name="qq_save" value="'.msg("admin_qq_save",0).'" class="btn btn-primary">
+            <input type="submit" name="qq_delete" value="'.msg("admin_qq_del",0).'" class="btn btn-danger">
+        </dd>
+      </dl>
+    </form>';
+}
+
 
 
 #######################################
@@ -349,6 +424,20 @@ if(isset($_POST['anket_login']) and isset($_POST['secret_token'])) {
             $db->query("UPDATE ?n SET `status`=?i WHERE `login`=?s LIMIT ?i",$ankets_tbl,3,$_POST['anket_login'],1);
             $msg = msg("admin_anket_rejected",2);
         }
+    } else $msg = msg("wrong_token",3);
+}
+
+if(isset($_POST['add_qq']) and isset($_POST['secret_token'])) {
+    if(check_token($_POST['secret_token'])) {
+        if($_POST['add_qq_type']=="input") 
+            $type = "VARCHAR(".$_POST['add_qq_maxlength'].")";
+        elseif($_POST['add_qq_type']=="textarea") 
+            $type = "TEXT(".$_POST['add_qq_maxlength'].")";
+        elseif($_POST['add_qq_type']=="select") 
+            $type = "TEXT";
+        $db->query("INSERT INTO ?n VALUES (NULL,?s,?s,?s,?i,?s,?s,?s,?i,?i,?s)",$qq_tbl,$_POST['add_qq_name'],$_POST['add_qq_type'],$_POST['add_qq_item_type'],$_POST['add_qq_maxlength'],$_POST['add_qq_pre'],$_POST['add_qq_body'],$_POST['add_qq_placeholder'],$_POST['add_qq_required'],$_POST['add_qq_disabled'],$_POST['add_qq_other']);
+        $db->query("ALTER TABLE ?n ADD ?n ?p NOT NULL",$ankets_tbl,$_POST['add_qq_name'],$type);
+        $msg = msg('admin_qq_added',2);
     } else $msg = msg("wrong_token",3);
 }
 ?>
