@@ -645,6 +645,7 @@ dd {
   }
   .dl-horizontal dd {
     margin-left: 180px;
+    margin-bottom: 5px;
   }
   .dl-horizontal dd:before,
   .dl-horizontal dd:after {
