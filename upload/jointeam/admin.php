@@ -1,6 +1,6 @@
 <?php
 if (!defined("FMJoinTeam")) die("hacking_attempt");
-if (!in_array($dlegroup,$admin_groups)) exit();
+if (!in_array($dlegroup,$admin_groups)) exit;
 
 check_updates();
 if($_GET['do'] == "ankets" and !isset($_GET['anket'])){

@@ -102,7 +102,7 @@ function msg($text,$type){
     elseif ($type == 4) echo '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
     elseif ($type == 0) return $lang[$text];
 }
-if(!$active) die(msg("not_active",3));
+if(!$active and !in_array($dlegroup, $admin_groups)) die(msg("not_active",3));
 if(!isset($_SESSION['dle_user_id']) || empty($_SESSION['dle_user_id']) || $_SESSION['dle_user_id']=='') die(msg("please_login",3));
 
 
@@ -168,10 +168,10 @@ function anket_status($login) {
 }
 
 function print_menu() {
-	global $_GET,$admin_groups,$dlegroup;
+	global $_GET,$admin_groups,$dlegroup,$allow_vote;
 	function ankets_num() {
 		global $db,$ankets_tbl;
-		$ankets = $db->query("SELECT * FROM ?n",$ankets_tbl);
+		$ankets = $db->query("SELECT * FROM ?n WHERE `status`=1",$ankets_tbl);
 		return $ankets->num_rows;
 	}
     if(!isset($_GET['do'])) 
@@ -191,11 +191,12 @@ function print_menu() {
                     <li><a href="?do=qq">'.msg("menu_admin_qq",0).'</a></li>
                 </ul>
             </li>';
+    if($allow_vote) 
+        $vote_li = '<li '.$vote_active.'><a href="?do=vote">'.msg("menu_vote",0).'</a></li>';
 	echo '
 	<ul class="nav nav-pills">
      	<li '.$home_active.'><a href="?">'.msg("menu_home",0).'</a></li>
-     	<li '.$vote_active.'><a href="?do=vote">'.msg("menu_vote",0).'</a></li>
-        '.$admin_li.'
+        '.$vote_li.$admin_li.'
     </ul>';
 }
 
@@ -466,5 +467,27 @@ if(isset($_POST['secret_token']) and isset($_POST['qq_name_new']) and isset($_PO
             $msg = msg('admin_qq_deleted',2);
         }
     } else $msg = msg("wrong_token",3);
+}
+
+if(isset($_POST['secret_token']) and isset($_POST['vote_login'])){
+    if(check_token($_POST['secret_token'])) {
+        $votes = $db->getRow("SELECT * FROM ?n WHERE `login`=?s LIMIT 1",$votes_tbl,$login);
+        if(isset($_POST['against_vote'])) {
+            if(count($votes)>0){
+                if($votes['against'] < $max_against_vote)
+                    $db->query("UPDATE ?n SET `against`=`against`+1 WHERE `login`=?s LIMIT 1",$votes_tbl,$login);
+            } else $db->query("INSERT INTO ?n (`login`,`against`) VALUES (?s,1)",$votes_tbl,$login);
+            $db->query("UPDATE ?n SET `votes`=`votes`-1 WHERE `login`=?s LIMIT 1",$ankets_tbl,$_POST['vote_login']);
+            $msg = msg("against_voted",2);
+        } elseif (isset($_POST['for_vote'])) { 
+            if(count($votes)>0) {
+                if($votes['forv'] < $max_for_vote)
+                    $db->query("UPDATE ?n SET `forv`=`forv`+1 WHERE `login`=?s LIMIT 1",$votes_tbl,$login);
+                echo "plused";
+            } else $db->query("INSERT INTO ?n (`login`,`forv`) VALUES (?s,1)",$votes_tbl,$login);
+            $db->query("UPDATE ?n SET `votes`=`votes`+1 WHERE `login`=?s LIMIT 1",$ankets_tbl,$_POST['vote_login']);
+            $msg = msg("for_voted",2);
+        }
+    }
 }
 ?>
