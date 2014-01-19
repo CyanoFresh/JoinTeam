@@ -10,11 +10,11 @@ if($_GET['do'] == "ankets" and !isset($_GET['anket'])){
 	   elseif($_GET['page'] < 1) $page = 1;
 	$start_from = ($page-1)*26;
 	if(isset($_POST['user'])){
-		$get_ankets = $db->query("SELECT * FROM ?n WHERE `status`=?i AND `login` LIKE ?s ORDER BY `votes` DESC LIMIT ?i, ?i",$ankets_tbl,1,"%".$_POST['user']."%",$start_from,25);
-		$get_count = $db->query("SELECT * FROM ?n WHERE `status`=?i AND `login` LIKE ?s",$ankets_tbl,1,"%".$_POST['user']."%");
+		$get_ankets = $db->query("SELECT * FROM ?n WHERE `login` LIKE ?s ORDER BY `status` ASC LIMIT ?i, ?i",$ankets_tbl,"%".$_POST['user']."%",$start_from,25);
+		$get_count = $db->query("SELECT * FROM ?n WHERE `login` LIKE ?s",$ankets_tbl,"%".$_POST['user']."%");
 	} else {
-		$get_ankets = $db->query("SELECT * FROM ?n WHERE `status`=?i ORDER BY `votes` DESC LIMIT ?i, ?i",$ankets_tbl,1,$start_from,25);
-		$get_count = $db->query("SELECT * FROM ?n WHERE `status`=?i",$ankets_tbl,1);
+		$get_ankets = $db->query("SELECT * FROM ?n ORDER BY `votes` DESC,`status` ASC LIMIT ?i, ?i",$ankets_tbl,$start_from,25);
+		$get_count = $db->query("SELECT * FROM ?n",$ankets_tbl);
 	}
 	echo msg("admin_ankets_wellcome",1).'
 	<form method="POST" class="form-inline" role="form">
@@ -31,14 +31,17 @@ if($_GET['do'] == "ankets" and !isset($_GET['anket'])){
         	</tr>
         </thead>
         <tbody>';
-    while($row = $get_ankets->fetch_assoc())
-	    echo '
-			<tr>
+    while($row = $get_ankets->fetch_assoc()){
+        if($row['status'] == 2) $tr_active = "success";
+        elseif($row['status'] == 3) $tr_active = "danger";
+        echo '
+            <tr class="'.$tr_active.'">
                 <td>'.$row['login'].'</td>
                 <td>'.$row['votes'].'</td>
                 <td>'.$row['date'].'</td>
                 <td><a class="btn btn-info" href="?do=ankets&anket='.$row['login'].'"><span class="glyphicon glyphicon-edit"></span></button></td>
-			</tr>';
+            </tr>';
+    }
 	echo '</tbody></table>';
 	$total_ankets = $get_count->num_rows;
 	$pages = ceil($total_ankets / 26);
