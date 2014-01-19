@@ -28,5 +28,5 @@ JoinTeam
 ***
 
 ### Ссылки:
-* [[Установка]]
-* [[Настройка]]
+* [[Установка | https://github.com/AlexMerser21/JoinTeam.wiki.git]]
+* [[Настройка | https://github.com/AlexMerser21/JoinTeam.wiki.git]]
