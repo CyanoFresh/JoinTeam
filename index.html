@@ -1,52 +1,90 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="JoinTeam : Сайт веб-приложения JoinTeam" />
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-    <title>JoinTeam</title>
+    <title>JoinTeam by AlexMerser21</title>
   </head>
 
   <body>
+    <header>
+      <div class="inner">
+        <h1>JoinTeam</h1>
+        <h2>Сайт веб-приложения JoinTeam</h2>
+        <a href="https://github.com/AlexMerser21/JoinTeam" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/AlexMerser21/JoinTeam">View on GitHub</a>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="jointeam" class="anchor" href="#jointeam"><span class="octicon octicon-link"></span></a>JoinTeam</h1>
 
-          <h1 id="project_title">JoinTeam</h1>
-          <h2 id="project_tagline">Сайт веб-приложения JoinTeam</h2>
+<p><img src="https://dl.dropboxusercontent.com/s/olr16wx3c4newix/JoinTeam_by_alexmerser.jpg"></p>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/AlexMerser21/JoinTeam/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/AlexMerser21/JoinTeam/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+<p><strong>Гибкая анкета на PHP и MySQLi</strong></p>
+
+<hr><p>С данным скриптом Вы сможете забыть о темах на своих форумах, не соответствие правилам набора и спамерах! В данном скрипте Вы сможете сами создавать вопросы для анкеты, модерировать, принимать, и, по желаню, добавлять сразу-же в группу модераторов:)Скрипт написан на безопасном классе mysqli - safemysql, с использованием типизированных плейсхолдеров, что обеспечивает превосходную защиту от sql-инъекций!</p>
+
+<hr><h3>
+<a name="%D0%A4%D0%BD%D1%83%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB" class="anchor" href="#%D0%A4%D0%BD%D1%83%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB"><span class="octicon octicon-link"></span></a>Фнукционал:</h3>
+
+<ul>
+<li>Все нужные настройки хранятся в config.php</li>
+<li>Настройка на 2 бд: с плагинами и аккаунтами пользователей(движком)</li>
+<li>Завершение набора модераторов</li>
+<li>Различные блокировки подачи при не соответствии нескольких факторов</li>
+<li>Основные настройки скрипта</li>
+<li>Доступ нескольким группам в админку(id групп)</li>
+<li>Отдельный файл с сообщениями и система сообщений(BETA) - не нужно бегать по всему скрипту и искать выводимые сообщения.</li>
+<li>Проверка версии скрипта на актуальность и вывод сообщения с ссылкой на новую только в админке</li>
+<li>Гибкое ручное добавление и редактирование вопросов для анкеты(особенность данной версии)</li>
+<li>Использование переменных в полях</li>
+<li>Выбор типа поля(Выпадающий список, простое поле, многострочное поле)</li>
+<li>Вывод reCAPTCHA, по желанию</li>
+<li>Возможность голосовать за определенного игрока(друга) или против другого(конкурента, врага). Ограничения на голосование</li>
+<li>Использование фреймворка bootstrap 3.0</li>
+<li>Стили не сбивают основной шаблон сайта, т.к. идет вставка через iframe</li>
+<li>Благодаря iframe-тегу, не нужно создавать отдельный tpl-файл в своем шаблоне</li>
+<li>Удобная админпанель для редактирование заявок и вопросов</li>
+<li>Не требует импорта sql-файлов в БД: скрипт все сам сделает, если не существует таблиц</li>
+</ul><hr><h3>
+<a name="%D0%A1%D1%81%D1%8B%D0%BB%D0%BA%D0%B8" class="anchor" href="#%D0%A1%D1%81%D1%8B%D0%BB%D0%BA%D0%B8"><span class="octicon octicon-link"></span></a>Ссылки:</h3>
+
+<ul>
+<li><a href="https://github.com/AlexMerser21/JoinTeam/wiki/%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0">Установка</a></li>
+<li><a href="https://github.com/AlexMerser21/JoinTeam/wiki/%D0%9D%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0">Настройка</a></li>
+</ul>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/AlexMerser21/JoinTeam/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/AlexMerser21/JoinTeam/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/AlexMerser21/JoinTeam"></a> is maintained by <a href="https://github.com/AlexMerser21">AlexMerser21</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a name="%D0%94%D0%BE%D0%B1%D1%80%D0%BE-%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D1%82%D1%8C" class="anchor" href="#%D0%94%D0%BE%D0%B1%D1%80%D0%BE-%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D1%82%D1%8C"><span class="octicon octicon-link"></span></a>Добро пожаловать!</h1>
-
-<p>Вы находитесь на официальном сайте веб-приложения <strong>JoinTeam</strong>!</p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">JoinTeam maintained by <a href="https://github.com/AlexMerser21">AlexMerser21</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
+  
   </body>
 </html>
