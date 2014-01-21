@@ -1,4 +1,9 @@
 <?php
+##############################
+# JoinTeam v1.0
+# Author: AlexMerser
+# License: GPL v2
+##############################
 if (!defined("FMJoinTeam")) die("hacking_attempt");
 if (!in_array($dlegroup,$admin_groups)) exit;
 

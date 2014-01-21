@@ -1,10 +1,15 @@
 <?php
+##############################
+# JoinTeam v1.0
+# Author: AlexMerser
+# License: GPL v2
+##############################
 if (!defined("FMJoinTeam")) die("hacking attempt");
 
 echo '
 <head>
     <script src="https://code.jquery.com/jquery.js"></script>
-    <link rel="stylesheet" href="https://raw.github.com/AlexMerser21/JoinTeam/gh-pages/inc/css/bootstrap.css">
+    <link rel="stylesheet" href="http://alexmerser21.github.io/JoinTeam/inc/css/bootstrap.css">
     <script src="http://alexmerser21.github.io/JoinTeam/inc/js/bootstrap.min.js"></script>
 </head>';
 session_start();
@@ -49,6 +54,7 @@ $create[] = "CREATE TABLE IF NOT EXISTS {$qq_tbl} (
   `name` varchar(100) NOT NULL,
   `type` varchar(100) NOT NULL,
   `item_type` varchar(100) NOT NULL,
+  `maxlength` int(11) NOT NULL DEFAULT '1',
   `pre` varchar(200) NOT NULL,
   `body` text NOT NULL,
   `placeholder` varchar(500) NOT NULL,
@@ -61,7 +67,7 @@ $create[] = "CREATE TABLE IF NOT EXISTS {$qq_tbl} (
 $create[] = "CREATE TABLE IF NOT EXISTS {$votes_tbl} (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `login` varchar(100) NOT NULL,
-  `for` int(11) NOT NULL,
+  `forv` int(11) NOT NULL,
   `against` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 );";

@@ -1,4 +1,9 @@
 <?php
+##############################
+# JoinTeam v1.0
+# Author: AlexMerser
+# License: GPL v2
+##############################
 $lang = array (
 	// Сообщения о ошибках
 	"hacking_attempt" => "Доступ запрещен",
