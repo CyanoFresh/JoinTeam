@@ -87,7 +87,7 @@ $fullname = $userinfo['fullname'];
 $land =  $userinfo['land'];
 
 if($check_versions){
-    $v_info = file("http://raw.github.com/AlexMerser21/JoinTeam/gh-pages/inc/version.txt");
+    $v_info = file("http://alexmerser21.github.io/JoinTeam/inc/version.txt");
     $actual = trim($v_info[0]);
     $link = trim($v_info[1]);
     $changelog = trim($v_info[2]);
