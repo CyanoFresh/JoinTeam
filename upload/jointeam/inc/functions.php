@@ -6,14 +6,14 @@
 ##############################
 if (!defined("FMJoinTeam")) die("hacking attempt");
 
+session_start();
+header("Content-Type: text/html; charset=utf8");
 echo '
 <head>
     <script src="https://code.jquery.com/jquery.js"></script>
     <link rel="stylesheet" href="http://alexmerser21.github.io/JoinTeam/inc/css/bootstrap.css">
     <script src="http://alexmerser21.github.io/JoinTeam/inc/js/bootstrap.min.js"></script>
 </head>';
-session_start();
-header("Content-Type: text/html; charset=utf8");
 require_once 'config.php';
 
 if(!$debug)
