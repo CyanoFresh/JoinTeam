@@ -489,7 +489,6 @@ if(isset($_POST['secret_token']) and isset($_POST['vote_login'])){
             if(count($votes)>0) {
                 if($votes['forv'] < $max_for_vote)
                     $db->query("UPDATE ?n SET `forv`=`forv`+1 WHERE `login`=?s LIMIT 1",$votes_tbl,$login);
-                echo "plused";
             } else $db->query("INSERT INTO ?n (`login`,`forv`) VALUES (?s,1)",$votes_tbl,$login);
             $db->query("UPDATE ?n SET `votes`=`votes`+1 WHERE `login`=?s LIMIT 1",$ankets_tbl,$_POST['vote_login']);
             $msg = msg("for_voted",2);
