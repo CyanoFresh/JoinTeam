@@ -632,7 +632,9 @@ dt {
 dd {
   margin-left: 0;
 }
-
+.dl-horizontal dt {
+    max-width:600px;
+}
 @media (min-width: 600px) {
   .dl-horizontal dt {
     float: left;
@@ -646,7 +648,7 @@ dd {
   .dl-horizontal dd {
     margin-left: 180px;
     margin-bottom: 5px;
-    max-width:700px;
+    max-width:600px;
   }
   .dl-horizontal dd:before,
   .dl-horizontal dd:after {
