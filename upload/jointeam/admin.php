@@ -66,9 +66,9 @@ if($_GET['do'] == "ankets" and !isset($_GET['anket'])){
 		$i++;
     }
 	echo $right.'</ul></center>';
-} elseif ($_GET['do'] == "ankets" and isset($_GET['anket'])) {
+} elseif ($_GET['do'] == "ankets" and isset($_GET['anket']))
 	print_anket($_GET['anket']);
-} elseif ($_GET['do'] == "qq" and !isset($_GET['qq'])) {
+elseif ($_GET['do'] == "qq" and !isset($_GET['qq'])) {
 	echo msg("admin_qq_wellcome",1).'
 	<div class="panel panel-default">
         <div class="panel-heading">
@@ -114,7 +114,7 @@ if($_GET['do'] == "ankets" and !isset($_GET['anket'])){
                 <div class="form-group" id="body" style="display: none;">
                   <label class="col-sm-3 control-label">'.msg("admin_add_qq_body",0).'</label>
                   <div class="col-sm-9">
-                    <textarea class="form-control" name="add_qq_body"></textarea>
+                    <textarea class="form-control" name="add_qq_body" id="body_value"></textarea>
                   </div>
                 </div>
                 <div class="form-group" id="maxl" style="display: none;">
@@ -186,7 +186,6 @@ if($_GET['do'] == "ankets" and !isset($_GET['anket'])){
             <td><a class="btn btn-info" href="?do=qq&qq='.$row['name'].'"><span class="glyphicon glyphicon-edit"></span></button></td>
         </tr>';
     }
-} elseif ($_GET['do'] == "qq" and isset($_GET['qq'])) {
+} elseif ($_GET['do'] == "qq" and isset($_GET['qq']))
     admin_qq($_GET['qq']);
-}
 ?>

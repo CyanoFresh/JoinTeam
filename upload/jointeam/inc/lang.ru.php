@@ -18,7 +18,7 @@ $lang = array (
 	"wrong_token" => "Обнаружена попытка взлома",
 	"admin_anket_error" => "Обнаружена ошибка. Включите дебаг для получения подробной информации",
 	// Сообщения успешного выполнения
-	"anket_sended" => "Вы успешно отправили анкету. Не забывайте проверять почту, ЛС и контактные ланные, которые вы указали.<br><button data-dismiss='alert' aria-hidden='true' class='btn btn-primary'>OK</button>",
+	"anket_sended" => "Вы успешно отправили анкету. Не забывайте проверять почту, ЛС и контактные данные, которые вы указали.<br><button data-dismiss='alert' aria-hidden='true' class='btn btn-primary btn-xs'>OK</button>",
 	"admin_anket_accepted" => "Вы успешно <b>приняли</b> заявку от игрока <b>".$_POST['anket_login']."</b>",
 	"admin_anket_added_and_accepted" => "Вы успешно <b>приняли</b> заявку от игрока <b>".$_POST['anket_login']."</b> и <b>добавили</b> его в группу <b>$moder_group</b>",
 	"admin_anket_rejected" => "Вы успешно <b>отклонили</b> заявку от игрока <b>".$_POST['anket_login']."</b>",
@@ -81,5 +81,8 @@ $lang = array (
 	// Отдельный вопрос
 	"admin_qq_save" => "Сохранить",
 	"admin_qq_del" => "Удалить",
+	// email-сообщения
+	"mail_subject" => "Статус анкеты обновлен",
+	"mail_body" => "<html><body>Здравствуйте, <b>$login</b>.<br><br>На сайте <b>$site_name</b>, где Вы заполнели анкету изменился!<br>Пожалуйста, перейдите на <a href='$script_url' target='_blank'>эту страницу</a>, чтобы узнать новый статус!<br><br><br>С Уважением, администрация <b>$site_name</b></html></body>",
 );
 ?>

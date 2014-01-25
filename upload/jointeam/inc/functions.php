@@ -1,6 +1,6 @@
 <?php
 ##############################
-# JoinTeam v1.0
+# JoinTeam v1.0.1
 # Author: AlexMerser
 # License: GPL v2
 ##############################
@@ -16,14 +16,27 @@ echo '
 </head>';
 require_once 'config.php';
 
-if(!$debug)
-    error_reporting(0);
-elseif($debug == 1)
-    error_reporting(E_ALL);
-elseif($debug == 2)
-    error_reporting(E_ERROR | E_WARNING | E_PARSE);
-elseif($debug == 3)
-    error_reporting(E_ALL ^ E_NOTICE);
+switch ($debug) {
+    case 1:
+        @error_reporting(E_ALL);
+        @ini_set('error_reporting', E_ALL);
+        break;
+    case 2:
+        @error_reporting(E_ERROR | E_WARNING | E_PARSE);
+        @ini_set('error_reporting', E_ERROR | E_WARNING | E_PARSE);
+        break;
+    case 3:
+        @error_reporting(E_ALL ^ E_NOTICE);
+        @ini_set('error_reporting', E_ALL ^ E_NOTICE);
+        break;
+    default:
+        @error_reporting(0);
+        @ini_set('error_reporting', E_ALL ^ E_NOTICE);
+        @ini_set ( 'display_errors', true );
+        @ini_set ( 'html_errors', false );
+        break;
+}
+
 
 
 #######################################
@@ -80,7 +93,7 @@ foreach($create as $table) {
 #######################################
 ############# Переменные ##############
 #######################################
-$userinfo = $db_u->getRow("SELECT * FROM `dle_users` WHERE `user_id`=?i LIMIT ?i",$_SESSION['dle_user_id'],1);
+$userinfo = $db_u->getRow("SELECT * FROM ?n WHERE `user_id`=?i LIMIT 1",$users_tbl,$_SESSION['dle_user_id']);
 $email = $userinfo['email'];
 $login = $userinfo['name'];
 $news_num = $userinfo['news_num'];
@@ -102,14 +115,28 @@ if($check_versions){
 require_once 'lang.'.$language.'.php';
 function msg($text,$type){
 	global $lang,$login,$_POST;
-	if($type == 1) echo '<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
-    elseif ($type == 2) echo '<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
-    elseif ($type == 3) echo '<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
-    elseif ($type == 4) echo '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
-    elseif ($type == 0) return $lang[$text];
+    switch ($type) {
+        case 0:
+            return $lang[$text];
+            break;
+        case 1:
+            echo '<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
+            break;
+        case 2:
+            echo '<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
+            break;
+        case 3:
+            echo '<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
+            break;
+        case 4:
+            echo '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'.$lang[$text].'</div>';
+            break;
+    }
 }
-if(!$active and !in_array($dlegroup, $admin_groups)) die(msg("not_active",3));
-if(!isset($_SESSION['dle_user_id']) || empty($_SESSION['dle_user_id']) || $_SESSION['dle_user_id']=='') die(msg("please_login",3));
+if(!$active and !in_array($dlegroup, $admin_groups)) 
+    die(msg("not_active",3));
+if(!isset($_SESSION['dle_user_id']) || empty($_SESSION['dle_user_id']) || $_SESSION['dle_user_id']=='') 
+    die(msg("please_login",3));
 
 
 
@@ -119,14 +146,14 @@ if(!isset($_SESSION['dle_user_id']) || empty($_SESSION['dle_user_id']) || $_SESS
 #######################################
 function check_updates() {
     global $actual,$version,$check_versions;
-    if($check_versions){
-        if($version != $actual) msg("please_update",4);
-    }
+    if($check_versions)
+        if($version != $actual) 
+            msg("please_update",4);
 }
 
 function is_banned($name) {
     global $db,$ban_tbl;
-    $get_bans = $db->getRow("SELECT * FROM ?n WHERE ?n=?s AND ?n=?i LIMIT ?i",$ban_tbl[0],$ban_tbl[1],$name,$ban_tbl[2],1,1);
+    $get_bans = $db->getRow("SELECT * FROM ?n WHERE ?n=?s AND ?n=?i LIMIT 1",$ban_tbl[0],$ban_tbl[1],$name,$ban_tbl[2],1);
     if(count($get_bans) > 0)
         return true;
     else
@@ -135,7 +162,7 @@ function is_banned($name) {
 
 function group($name) {
     global $db,$pex_inh,$default_group;
-    $get_group = $db->getRow("SELECT * FROM ?n WHERE `child`=?s",$pex_inh,$name);
+    $get_group = $db->getRow("SELECT * FROM ?n WHERE `child`=?s LIMIT 1",$pex_inh,$name);
     if(count($get_group) > 0)
         return $get_group["parent"];
     else
@@ -145,7 +172,7 @@ function group($name) {
 function ptime() {
     global $db,$pt_tbl,$login,$min_ptime;
     if($min_ptime != 0){
-        $user_ptime = $db->getRow("SELECT * FROM ?n WHERE `username`=?s LIMIT ?i",$pt_tbl,$login,1);
+        $user_ptime = $db->getRow("SELECT * FROM ?n WHERE `username`=?s LIMIT 1",$pt_tbl,$login);
         if(count($user_ptime)>0) return $user_ptime['playtime'];
         else return 0;
     }
@@ -165,12 +192,17 @@ function send_check() {
 
 function anket_status($login) {
     global $anket;
-    if($anket['status'] == 1)
-        return msg('status_1',4);
-    elseif ($anket['status'] == 2)
-        return msg('status_2',2);
-    elseif ($anket['status'] == 3)
-        return msg('status_3',3);
+    switch ($anket['status']) {
+        case 2:
+            return msg('status_2',2);
+            break;
+        case 3:
+            return msg('status_3',3);
+            break;
+        default:
+            return msg('status_1',4);
+            break;
+    }
 }
 
 function print_menu() {
@@ -180,12 +212,17 @@ function print_menu() {
 		$ankets = $db->query("SELECT * FROM ?n WHERE `status`=1",$ankets_tbl);
 		return $ankets->num_rows;
 	}
-    if(!isset($_GET['do'])) 
-        $home_active = 'class="active"';
-    elseif($_GET['do'] == "vote") 
-        $vote_active = 'class="active"';
-	elseif($_GET['do'] == "qq" or $_GET['do'] == "ankets") 
-        $admin_active = 'active';
+    switch ($_GET['do']) {
+        case 'vote':
+            $vote_active = 'class="active"';
+            break;
+        case 'qq': case 'ankets':
+            $admin_active = 'active';
+            break;
+        default:
+            $home_active = 'class="active"';
+            break;
+    }
     if(in_array($dlegroup,$admin_groups))
         $admin_li = '
             <li class="dropdown '.$admin_active.'">
@@ -221,6 +258,7 @@ function print_form() {
     $get_qq = $db->query("SELECT * FROM ?n",$qq_tbl);
     function print_qq($name,$pre,$body,$type,$item_type,$maxlength,$placeholder,$required,$disabled,$other){
         global $email,$login,$news_num,$comm_num,$dlegroup,$info,$fullname,$land,$icq,$user_ptime;
+
         $name = htmlspecialchars(strip_tags($name));
         $pre = htmlspecialchars(strip_tags(eval('return"'.addslashes($pre).'";'),'<b><a>'),ENT_QUOTES);
         $body = htmlspecialchars(strip_tags(eval('return"'.addslashes($body).'";')));
@@ -228,10 +266,12 @@ function print_form() {
         $item_type = htmlspecialchars(strip_tags($item_type));
         $placeholder = htmlspecialchars(strip_tags(eval('return"'.addslashes($placeholder).'";')));
         $other = htmlspecialchars(eval('return"'.addslashes($other).'";'),ENT_QUOTES);
+
         if($required == 1) $required = "required";
             else $required = false;
         if($disabled == 1) $disabled = "readonly";
             else $disabled = false;
+
         echo '
         <div class="form-group">
             <label class="col-xs-2 control-label">'.$pre.'</label>
@@ -240,7 +280,7 @@ function print_form() {
                 echo '<input type="'.$item_type.'" name="'.$name.'" maxlength="'.$maxlength.'" value="'.$body.'" class="form-control" placeholder="'.$placeholder.'" '.$other.' '.$required.' '.$disabled.'>';
             elseif ($type == "select") {
                 echo '<select name="'.$name.'" class="form-control" '.$item_type.' '.$other.' '.$required.' '.$disabled.'>';
-                $arr = explode(", ", $body);
+                $arr = explode("\n", $body);
                 foreach($arr as $item){
                     echo '<option value="'.$item.'">'.$item.'</option>';
                 }
@@ -252,6 +292,7 @@ function print_form() {
 
     function print_captcha() {
         global $recaptcha,$publickey;
+
         if($recaptcha){
             require_once('recaptchalib.php');
             echo '
@@ -289,13 +330,15 @@ function print_anket($login) {
         $body = htmlspecialchars(strip_tags($body,'<b><a>'),ENT_QUOTES);
         echo '<dt>'.$pre.'</dt> <dd>'.$body.'</dd>';
     }
+
     global $db,$ankets_tbl,$qq_tbl,$secret_token;
-    $anket = $db->query("SELECT * FROM ?n WHERE `login`=?s LIMIT ?i",$ankets_tbl,$login,1);
+    $anket = $db->query("SELECT * FROM ?n WHERE `login`=?s LIMIT 1",$ankets_tbl,$login);
     $get_qq = $db->query("SELECT * FROM ?n",$qq_tbl);
+    
     if($anket->num_rows > 0)
         while($ank = $anket->fetch_assoc()){
             echo '<dl class="dl-horizontal">
-                    <dt>'.msg("admin_anket_login",0).'</dt><dd>'.$ank['login'].'</dd>
+                    <dt>'.msg("admin_anket_login",0).'</dt><dd><a href="/user/'.$ank['login'].'" target="_blank">'.$ank['login'].'</a></dd>
                     <dt>'.msg("admin_anket_group",0).'</dt><dd>'.group($ank['login']).'</dd>
                     <dt>'.msg("admin_anket_date",0).'</dt><dd>'.$ank['date'].'</dd>
                     <dt>'.msg("admin_anket_votes",0).'</dt><dd>'.$ank['votes'].'</dd>';
@@ -434,6 +477,8 @@ if(isset($_POST['anket_login']) and isset($_POST['secret_token'])) {
             $db->query("UPDATE ?n SET `status`=?i WHERE `login`=?s LIMIT ?i",$ankets_tbl,3,$_POST['anket_login'],1);
             $msg = msg("admin_anket_rejected",2);
         }
+        if($send_mail)
+            mail($email, msg("mail_subject",0), msg("mail_body",0), 'Content-type: text/html; charset=iso-8859-1' . "\r\n");
     } else $msg = msg("wrong_token",3);
 }
 
@@ -446,7 +491,7 @@ if(isset($_POST['add_qq']) and isset($_POST['secret_token'])) {
         elseif($_POST['add_qq_type']=="select") {
             $_POST['add_qq_maxlength'] = 1;
             $type = "TEXT";
-        } 
+        }
         $db->query("INSERT INTO ?n VALUES (NULL,?s,?s,?s,?s,?s,?s,?s,?s,?s,?s)",$qq_tbl,$_POST['add_qq_name'],$_POST['add_qq_type'],$_POST['add_qq_item_type'],$_POST['add_qq_maxlength'],$_POST['add_qq_pre'],$_POST['add_qq_body'],$_POST['add_qq_placeholder'],$_POST['add_qq_required'],$_POST['add_qq_disabled'],$_POST['add_qq_other']);
         $db->query("ALTER TABLE ?n ADD ?n ?p NOT NULL",$ankets_tbl,$_POST['add_qq_name'],$type);
         $msg = msg('admin_qq_added',2);
@@ -487,12 +532,11 @@ if(isset($_POST['secret_token']) and isset($_POST['vote_login'])){
             $msg = msg("against_voted",2);
         } elseif (isset($_POST['for_vote'])) { 
             if(count($votes)>0) {
-                if($votes['forv'] < $max_for_vote)
-                    $db->query("UPDATE ?n SET `forv`=`forv`+1 WHERE `login`=?s LIMIT 1",$votes_tbl,$login);
+                if($votes['forv'] < $max_for_vote) $db->query("UPDATE ?n SET `forv`=`forv`+1 WHERE `login`=?s LIMIT 1",$votes_tbl,$login);
             } else $db->query("INSERT INTO ?n (`login`,`forv`) VALUES (?s,1)",$votes_tbl,$login);
             $db->query("UPDATE ?n SET `votes`=`votes`+1 WHERE `login`=?s LIMIT 1",$ankets_tbl,$_POST['vote_login']);
             $msg = msg("for_voted",2);
         }
-    }
+    } else $msg = msg("wrong_token",3);
 }
 ?>
